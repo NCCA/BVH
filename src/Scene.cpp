@@ -91,6 +91,8 @@ void Scene::draw() const
     (*shader)["nglColourShader"]->use();
 
     ngl::Mat4 globalM = getTransformation()->getMatrix();
+    ngl::Mat4 proj=ngl::perspective(45.0,1.0f,0.1,100);
+    ngl::Mat4 view=ngl::lookAt(ngl::Vec3(0,25,100),ngl::Vec3(0,0,0),ngl::Vec3(0,1,0));
     for(std::list<Wall *>::const_iterator itr = m_walls.begin(); itr!= m_walls.end(); ++itr)
     {
         if((*itr)->draw_flag)
@@ -101,7 +103,9 @@ void Scene::draw() const
                 getTransformation()->setScale((*itr)->size, (*itr)->size, (*itr)->size);
                 getTransformation()->setRotation(getRotationFromY(ngl::Vec3((*itr)->a,(*itr)->b,(*itr)->c)));
                 ngl::Mat4 wallM = getTransformation()->getMatrix();
-                ngl::Mat4 MVP=wallM*globalM*getCamera()->getVPMatrix();
+
+                ngl::Mat4 MVP=wallM *view*proj;   //*globalM*getCamera()->getVPMatrix();
+
                 shader->setShaderParamFromMat4("MVP",MVP);
                 // get an instance of the VBO primitives for drawing
                 ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();

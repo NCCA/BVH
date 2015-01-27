@@ -28,8 +28,10 @@ void Bvh::drawBones(Joint *_currentJoint, ngl::Mat4 _parentM) const
 {
     ngl::ShaderLib *shader=ngl::ShaderLib::instance();
     (*shader)["nglDiffuseShader"]->use();
+    ngl::Mat4 proj=ngl::perspective(45.0,1.0f,0.1,100);
+    ngl::Mat4 view=ngl::lookAt(ngl::Vec3(0,25,100),ngl::Vec3(0,0,0),ngl::Vec3(0,1,0));
 
-    ngl::Mat4 cameraM = m_parent->getCamera()->getVPMatrix();
+    ngl::Mat4 cameraM = view*proj;      ;//m_parent->getCamera()->getVPMatrix();
     ngl::Mat4 MVP=_parentM*cameraM;
     ngl::Mat3 normalM = MVP;
     normalM.inverse();
@@ -49,13 +51,13 @@ void Bvh::drawBones(Joint *_currentJoint, ngl::Mat4 _parentM) const
             {
             case 0: rotX.rotateX(_currentJoint->m_rotate[0][m_currentFrames]);
                 currentOrientM *= rotX;
-                break;
+            break;
             case 1: rotY.rotateY(_currentJoint->m_rotate[1][m_currentFrames]);
                 currentOrientM *= rotY;
-                break;
+            break;
             case 2: rotZ.rotateZ(_currentJoint->m_rotate[2][m_currentFrames]);
                 currentOrientM *= rotZ;
-                break;
+            break;
             }
         }
     }
