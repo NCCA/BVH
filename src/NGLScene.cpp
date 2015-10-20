@@ -22,7 +22,7 @@ const static float INCREMENT=0.1;
 //----------------------------------------------------------------------------------------------------------------------
 const static float ZOOM=1;
 
-NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
+NGLScene::NGLScene()
 {
     m_rotate=false;
     // mouse rotation values set to 0
@@ -41,24 +41,18 @@ NGLScene::~NGLScene()
   delete m_scene;
 }
 
-void NGLScene::resizeEvent(QResizeEvent *_event )
+void NGLScene::resizeGL(int _w, int _h)
 {
-  if(isExposed())
-  {
-  int w=_event->size().width();
-  int h=_event->size().height();
-  // set the viewport for openGL
-  glViewport(0,0,w,h);
+  // set the viewport for openGL we need to take into account retina display
+  // etc by using the pixel ratio as a multiplyer
+  glViewport(0,0,_w*devicePixelRatio(),_h*devicePixelRatio());
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)w/h,0.05,350);
-  m_text->setScreenSize(w,h);
-
-  renderLater();
-  }
+  m_cam->setShape(45.0f,(float)width()/height(),0.05f,350.0f);
+  update();
+  m_text->setScreenSize(_w,_h);
 }
 
-
-void NGLScene::initialize()
+void NGLScene::initializeGL()
 {
   // we must call this first before any other GL commands to load and link the
   // gl commands from the lib, if this is not done program will crash
@@ -96,7 +90,7 @@ void NGLScene::initialize()
   m_scene=new Scene(&m_transformStack,m_cam);
   m_scene->addNewWall(ngl::Vec3(0,0,0), 200, ngl::Vec3(0.0, 1.0, 0.0),true);
 
-  setBvhFileName("bvh/Slip_down_IceSlip.bvh");
+  setBvhFileName("bvh/Male1_B10_WalkTurnLeft45.bvh");
   Bvh *character = new Bvh(m_bvhFileName, m_scene);
   m_scene->addCharacter(character);
 
@@ -112,7 +106,7 @@ void NGLScene::initialize()
 
 
 
-void NGLScene::render()
+void NGLScene::paintGL()
 {
   // clear the screen and depth buffer
   if(!m_trace)
@@ -122,8 +116,6 @@ void NGLScene::render()
   QTime newTime = currentTime.currentTime();
   int msecsPassed = currentTime.msecsTo(newTime);
   currentTime = newTime;
-
-
 
   QString text;
   text.sprintf("number of characters %d",m_scene->getNumCharacters());
@@ -158,7 +150,7 @@ void NGLScene::flipAnimationStatus()
 void NGLScene::timerEvent(QTimerEvent *_event)
 {
     m_scene->update();
-    renderLater();
+    update();
 }
 
 
@@ -185,7 +177,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
         m_modelPos.m_x += INCREMENT * diffX;
         m_modelPos.m_y -= INCREMENT * diffY;
     }
-    renderLater();
+    update();
 }
 
 
@@ -244,7 +236,7 @@ void NGLScene::wheelEvent(QWheelEvent *_event)
 	}
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	renderLater();
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -273,5 +265,5 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   }
   // finally update the GLWindow and re-draw
   //if (isExposed())
-    renderLater();
+    update();
 }

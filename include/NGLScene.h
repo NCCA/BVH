@@ -1,12 +1,12 @@
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
-#include "OpenGLWindow.h"
 #include <ngl/Camera.h>
 #include <ngl/Colour.h>
 #include <ngl/Light.h>
 #include <ngl/Transformation.h>
 #include <ngl/Text.h>
 #include "Scene.h"
+#include <QOpenGLWindow>
 #include <QTime>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -22,14 +22,14 @@
 /// put in this file
 //----------------------------------------------------------------------------------------------------------------------
 
-class NGLScene : public OpenGLWindow
+class NGLScene : public QOpenGLWindow
 {
   public:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief ctor for our NGL drawing class
     /// @param [in] parent the parent window to the class
     //----------------------------------------------------------------------------------------------------------------------
-    NGLScene(QWindow *_parent=0);
+    NGLScene();
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief dtor must close down ngl and release OpenGL resources
     //----------------------------------------------------------------------------------------------------------------------
@@ -38,22 +38,26 @@ class NGLScene : public OpenGLWindow
     /// @brief the initialize class is called once when the window is created and we have a valid GL context
     /// use this to setup any default GL stuff
     //----------------------------------------------------------------------------------------------------------------------
-    void initialize();
+    void initializeGL();
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief this is called everytime we want to draw the scene
     //----------------------------------------------------------------------------------------------------------------------
-    void render();
+    void paintGL();
+    //----------------------------------------------------------------------------------------------------------------------
+    /// @brief this is called everytime we resize
+    //----------------------------------------------------------------------------------------------------------------------
+    void resizeGL(int _w, int _h);
 
     /// @brief delete the character
-    inline void clearCharacters(){m_scene->clearCharacters(); }
+    void clearCharacters(){m_scene->clearCharacters(); }
     /// @brief replay the animation from beginning
-    inline void replay() {m_scene->replay();}
+    void replay() {m_scene->replay();}
     /// @brief pause the animation and restarted when click "p" again
     void flipAnimationStatus();
-    inline void forwardAnimation(){m_scene->forwardAnimation();};
-    inline void backwardAnimation(){m_scene->backwardAnimation();};
+    void forwardAnimation(){m_scene->forwardAnimation();};
+    void backwardAnimation(){m_scene->backwardAnimation();};
     /// @brief set the name of the motion file to play
-    inline void setBvhFileName(std::string _bvhFileName) {m_bvhFileName = _bvhFileName;};
+    void setBvhFileName(std::string _bvhFileName) {m_bvhFileName = _bvhFileName;};
 
 private:
     //----------------------------------------------------------------------------------------------------------------------
@@ -112,11 +116,6 @@ private:
     QTime currentTime;
     std::string m_bvhFileName;
 
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief Qt Event called when the window is re-sized
-    /// @param [in] _event the Qt event to query for size etc
-    //----------------------------------------------------------------------------------------------------------------------
-    void resizeEvent(QResizeEvent *_event);
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc

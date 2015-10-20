@@ -104,7 +104,7 @@ void Scene::draw() const
                 getTransformation()->setRotation(getRotationFromY(ngl::Vec3((*itr)->a,(*itr)->b,(*itr)->c)));
                 ngl::Mat4 wallM = getTransformation()->getMatrix();
 
-                ngl::Mat4 MVP=wallM *view*proj;   //*globalM*getCamera()->getVPMatrix();
+                ngl::Mat4 MVP=globalM *view*proj;   //*globalM*getCamera()->getVPMatrix();
 
                 shader->setShaderParamFromMat4("MVP",MVP);
                 // get an instance of the VBO primitives for drawing
